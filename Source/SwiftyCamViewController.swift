@@ -365,7 +365,7 @@ import AVFoundation
 
 	*/
 
-	public func takePhoto() {
+	public func takePhoto(animated: Bool) {
 
 		guard let device = videoDevice else {
 			return
@@ -381,18 +381,23 @@ import AVFoundation
 			flashView?.backgroundColor = UIColor.white
 			previewLayer.addSubview(flashView!)
 
-			UIView.animate(withDuration: 0.1, delay: 0.0, options: .curveEaseInOut, animations: {
-				self.flashView?.alpha = 1.0
-
-			}, completion: { (_) in
-				self.capturePhotoAsyncronously(completionHandler: { (success) in
-					UIView.animate(withDuration: 0.1, delay: 0.0, options: .curveEaseInOut, animations: {
-						self.flashView?.alpha = 0.0
-					}, completion: { (_) in
-						self.flashView?.removeFromSuperview()
-					})
-				})
-			})
+            if (animated) {
+			    UIView.animate(withDuration: 0.1, delay: 0.0, options: .curveEaseInOut, animations: {
+			    	self.flashView?.alpha = 1.0
+			    }, completion: { (_) in
+			    	self.capturePhotoAsyncronously(completionHandler: { (success) in
+			    		UIView.animate(withDuration: 0.1, delay: 0.0, options: .curveEaseInOut, animations: {
+			    			self.flashView?.alpha = 0.0
+			    		}, completion: { (_) in
+			    			self.flashView?.removeFromSuperview()
+			    		})
+			    	})
+			    })
+			} else {
+			    self.capturePhotoAsyncronously(completionHandler: { (success) in
+			        self.flashView?.removeFromSuperview()
+                })
+			}
 		} else {
 			if device.isFlashActive == true {
 				changeFlashSettings(device: device, mode: .off)
